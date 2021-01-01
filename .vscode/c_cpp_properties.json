@@ -1,13 +1,23 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
 {
     "configurations": [
         {
-            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
-        },
-        {
-            "name": "Win32",
+            "name": "PlatformIO",
             "includePath": [
                 "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/include",
                 "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/src",
+                "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit SSD1306",
+                "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit GFX Library",
+                "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit BusIO",
+                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SPI",
+                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA",
+                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA/utility",
+                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Wire",
+                "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/arduinoFFT/src",
                 "C:/Users/Dan/.platformio/packages/framework-cmsis/CMSIS/Include",
                 "C:/Users/Dan/.platformio/packages/framework-cmsis-atmel/CMSIS/Device/ATMEL",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino",
@@ -15,21 +25,18 @@
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore/tinyusb/src",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/variants/itsybitsy_m4",
+                "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit SSD1306@2.4.1",
                 "C:/Users/Dan/.platformio/lib/Adafruit Unified Sensor",
                 "C:/Users/Dan/.platformio/lib/BME280_ID901/src",
                 "C:/Users/Dan/.platformio/lib/LiquidCrystal",
                 "C:/Users/Dan/.platformio/lib/MPU6050/src",
-                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA",
-                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA/utility",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/CI_Tests",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/HID",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/I2S/src",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SAMD_AnalogCorrection/src",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SDU/src",
-                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SPI",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Servo/src",
                 "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/USBHost/src",
-                "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Wire",
                 "C:/Users/Dan/.platformio/packages/tool-unity",
                 ""
             ],
@@ -38,6 +45,14 @@
                 "path": [
                     "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/include",
                     "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/src",
+                    "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit SSD1306",
+                    "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit GFX Library",
+                    "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit BusIO",
+                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SPI",
+                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA",
+                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA/utility",
+                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Wire",
+                    "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/arduinoFFT/src",
                     "C:/Users/Dan/.platformio/packages/framework-cmsis/CMSIS/Include",
                     "C:/Users/Dan/.platformio/packages/framework-cmsis-atmel/CMSIS/Device/ATMEL",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino",
@@ -45,27 +60,24 @@
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore/tinyusb/src",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/variants/itsybitsy_m4",
+                    "c:/Users/Dan/Documents/PlatformIO/Projects/Guitar-Tuner/.pio/libdeps/adafruit_itsybitsy_m4/Adafruit SSD1306@2.4.1",
                     "C:/Users/Dan/.platformio/lib/Adafruit Unified Sensor",
                     "C:/Users/Dan/.platformio/lib/BME280_ID901/src",
                     "C:/Users/Dan/.platformio/lib/LiquidCrystal",
                     "C:/Users/Dan/.platformio/lib/MPU6050/src",
-                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA",
-                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Adafruit_ZeroDMA/utility",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/CI_Tests",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/HID",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/I2S/src",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SAMD_AnalogCorrection/src",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SDU/src",
-                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/SPI",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Servo/src",
                     "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/USBHost/src",
-                    "C:/Users/Dan/.platformio/packages/framework-arduino-samd-adafruit/libraries/Wire",
                     "C:/Users/Dan/.platformio/packages/tool-unity",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=50003",
+                "PLATFORMIO=50004",
                 "ARDUINO_ITSYBITSY_M4",
                 "ADAFRUIT_ITSYBITSY_M4_EXPRESS",
                 "__SAMD51G19A__",
@@ -86,7 +98,6 @@
                 "USB_CONFIG_POWER=100",
                 ""
             ],
-            "intelliSenseMode": "gcc-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
             "compilerPath": "C:/Users/Dan/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc.exe",

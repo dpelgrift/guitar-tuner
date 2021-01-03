@@ -4,6 +4,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <arduinoFFT.h>
+#include <stdlib.h>
+
 
 
 // Screen Params
@@ -24,6 +26,8 @@ These values can be changed in order to evaluate the functions
 const uint16_t samples = 1024; //This value MUST ALWAYS be a power of 2
 const double samplingFrequency = 7000; //Hz, must be less than 10000 due to ADC
 
+const double freqCoeffFactor = 0.997; // Multiplication factor applied to FFT output to correct freq in Hz
+
 unsigned int sampling_period_us;
 unsigned long microseconds;
 
@@ -42,9 +46,24 @@ double vImag[samples];
 
 // Notes/frequency params
 
+#define NOTE_DIFF 0.02508 // Mean gap length between log10 frequencies
+
+#define CORRECT_NOTE_DIFF 0.00125 // Mean gap length between log10 frequencies
+
+#define NUM_LEVEL_BARS 5
+
+#define LEVEL_BAR_WIDTH 10
+
+#define VOLUME_THRES 650 // Threshold to update screen
+
+
 // log10 freq values for octaves 3-7
-double logFreqVals[60] =
+double logFreqVals[72] =
                         {
+                        1.815644149, 1.840733235, 1.86581438,
+                        1.890867939, 1.915979914, 1.941063988,
+                        1.966141733, 1.991226076, 2.016322854,
+                        2.041392685, 2.066475014, 2.091561448,
                         2.116640946, 2.141731895, 2.166814799,
                         2.191897934, 2.216983559, 2.242069112,
                         2.267171728, 2.292256071, 2.317331935,
@@ -67,67 +86,56 @@ double logFreqVals[60] =
                         3.546542663, 3.571628486, 3.596714724
                         };
 
-int octaves[5] = {3,4,5,6,7};
+const int octaves[6] = {2,3,4,5,6,7};
 
-String notes[12] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+const String notes[12] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
 
-void testDisplayNotes() {
+String noteToDisplay;
 
-    String notes[12] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+int octaveToDisplay;
 
-    display.setTextSize(4);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    
-    for(int nIdx=0;nIdx<12;nIdx++) {
-        display.setCursor(55,10);             // Start at top-left corner
-        display.clearDisplay();
-
-        display.println(notes[nIdx]);
-
-        display.display();
-        delay(2000);
-    }
-}
-
-void testLines(){
-    for(int i=0; i<display.width(); i+=3) {
-        display.clearDisplay(); // Clear display buffer
-        display.drawLine(i, 32, i, display.height()-1, SSD1306_WHITE);
-        display.display(); // Update screen with each newly-drawn line
-        delay(100);
-    }
-}
+double freqDiffToDisplay;
 
 
+// Status LED pin
+#define STATUS_LED 10
 
-void testFFT(){
-    /*SAMPLING*/
-    microseconds = micros();
-    for(int i=0; i<samples; i++)
-    {
-        vReal[i] = analogRead(CHANNEL);
-        vImag[i] = 0;
-        while(micros() - microseconds < sampling_period_us){
-        //empty loop
+
+int getNearestElementIdx(double arr[], int n, double target) {
+    int nearestIdx = 0;
+    double nearestDiff;
+    double tmpDiff;
+    for (int aIdx = 0; aIdx<n; aIdx++){
+        if (aIdx == 0) {
+            nearestDiff = abs(arr[0]-target);
+            continue;
+        } 
+        tmpDiff = abs(arr[aIdx]-target);
+
+        if (tmpDiff < nearestDiff) {
+            nearestIdx = aIdx;
+            nearestDiff = tmpDiff;
         }
-        microseconds += sampling_period_us;
     }
-    /* Print the results of the sampling according to time */
-    // Serial.println("Data:");
-    // PrintVector(vReal, samples, SCL_TIME);
-    FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);	/* Weigh data */
-    // Serial.println("Weighed data:");
-    // PrintVector(vReal, samples, SCL_TIME);
-    FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
-    // Serial.println("Computed Real values:");
-    // PrintVector(vReal, samples, SCL_INDEX);
-    // Serial.println("Computed Imaginary values:");
-    // PrintVector(vImag, samples, SCL_INDEX);
-    FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
-    // Serial.println("Computed magnitudes:");
-    // PrintVector(vReal, (samples >> 1), SCL_FREQUENCY);
-    double x = FFT.MajorPeak(vReal, samples, samplingFrequency);
-    Serial.println(x*5.34, 6); //Print out what frequency is the most dominant.
+
+    return nearestIdx;
+}
+
+void getNearestNoteAndOctave(double freq, String *note, int *octave, double *logFreqDiff){
+
+    double logFreq = log10(freq);
+
+    int nearestIdx = getNearestElementIdx(logFreqVals,72,logFreq);
+
+    *logFreqDiff = logFreq - logFreqVals[nearestIdx];
+
+    int noteIdx = nearestIdx % 12;
+
+    int octaveIdx = floor(double(nearestIdx)/12.0);
+
+    *note = notes[noteIdx];
+    *octave = octaves[octaveIdx];
+
 }
 
 double computeFFT(){
@@ -147,11 +155,13 @@ double computeFFT(){
     FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
     FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
     double x = FFT.MajorPeak(vReal, samples, samplingFrequency);
-    return x*5.34;
+    return x*freqCoeffFactor;
 }
 
 
-void renderFrame(double freq) {
+
+
+void drawBlankFrame() {
     display.clearDisplay(); // Clear display buffer
 
     // Draw border
@@ -160,45 +170,150 @@ void renderFrame(double freq) {
     display.drawLine(display.width()-1, display.height()-1, 0, display.height()-1, SSD1306_WHITE);
     display.drawLine(0, 0, 0, display.height()-1, SSD1306_WHITE);
 
-    //
-    display.setTextSize(2);             // Normal 1:1 pixel scale
+    // Draw dividing line
+    display.drawLine(0, 31, display.width()-1, 31, SSD1306_WHITE);
+
+    // Draw intermediate vertical lines
+    display.drawLine(54, 31, 54, display.height()-1, SSD1306_WHITE);
+    display.drawLine(73, 31, 73, display.height()-1, SSD1306_WHITE);
+
+}
+
+void drawFreqBar(double freqDiff) {
+    // check if close enough to note for center bar
+    if (abs(freqDiff) <= CORRECT_NOTE_DIFF) {
+        display.fillRect(56,33,16,30,SSD1306_WHITE);
+    } else {
+        int barIdx = floor(abs(freqDiff)/(NOTE_DIFF/1.95)*5);
+
+        int rectXCoord;
+        if (freqDiff > 0) { // If current freq greater than nearest note
+            rectXCoord = 75+(barIdx*LEVEL_BAR_WIDTH);
+        } else { // If current freq lower than nearest note
+            rectXCoord = 43-(barIdx*LEVEL_BAR_WIDTH);
+        }
+        display.fillRect(rectXCoord,33,10,30,SSD1306_WHITE);
+    }
+
+
+}
+
+void drawFrame(double freq,String note,int octave,double freqDiff) {
+    drawBlankFrame();
+
+    // Draw Note, octave, & frequency
     display.setTextColor(SSD1306_WHITE);        // Draw white text
-    
-    display.setCursor(40,5);
 
-    display.println(freq,4);
+    // Draw Note
+    display.setTextSize(3);             
+    display.setCursor(20,5);
+    display.print(note);
 
-    display.display();
+    // Draw Octave
+    display.setTextSize(1);             
+    display.setCursor(60,20);
+    display.print(octave);
 
+    // Draw Frequency
+    display.setTextSize(1);             
+    display.setCursor(80,10);
+    display.print(int(freq));
+    display.print(F(" Hz"));
+
+    drawFreqBar(freqDiff);
+
+}
+
+double computeMean(double arr[], int n){
+
+    double sum = 0;
+
+    for (int i = 0; i < n; i++) {
+        sum += arr[i];
+    }
+    return sum/double(n);
 }
 
 
 void setup() {
+
+    // Switch on status LED
+    pinMode(STATUS_LED, OUTPUT);
+    digitalWrite(STATUS_LED, HIGH);
+
+    sampling_period_us = round(1000000*(1.0/samplingFrequency));
     Serial.begin(9600);
 
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3D)) { // Address 0x3D for 128x64
         Serial.println(F("SSD1306 allocation failed"));
-        for(;;); // Don't proceed, loop forever
+        // Blink status LED to indicate error
+        while (1){
+            digitalWrite(STATUS_LED, HIGH);
+            delay(500);               
+            digitalWrite(STATUS_LED, LOW);
+            delay(500);               
+        }
     }
 
-    // Show initial display buffer contents on the screen --
-    // the library initializes this with an Adafruit splash screen.
+    // Show initial blank display
+    drawBlankFrame();
     display.display();
     delay(2000); // Pause for 2 seconds
 
-    // Clear the buffer
-    display.clearDisplay();
-    display.display();
+
+    // // Debug 
+    // int nearestIdx;
+    // double testVals[10] = {1.9, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9};
+    // for (int i = 0; i < 10; i++) {
+    //     nearestIdx = getNearestElementIdx(logFreqVals,60,testVals[i]);
+    //     Serial.print("Val: ");
+    //     Serial.print(testVals[i]);
+    //     Serial.print(" | Idx: ");
+    //     Serial.print(nearestIdx);
+    //     Serial.println("");
+    // }
+
+    
+
 }
 
 void loop() {
 
-    // testFFT();
-
     double freq = computeFFT();
 
-    renderFrame(freq);
+    
 
-    delay(50);
+    double meanVal = computeMean(vReal,samples);
+
+    if (meanVal > VOLUME_THRES) {
+        getNearestNoteAndOctave(freq, &noteToDisplay, &octaveToDisplay, &freqDiffToDisplay);
+        drawFrame(freq,noteToDisplay,octaveToDisplay,freqDiffToDisplay);
+    } else {
+        drawBlankFrame();
+    }
+    display.display();
+    // Serial.print("Mean vReal: ");
+    // Serial.print(meanVal);
+    // Serial.println("");
+
+
+    
+
+    // Serial.print("Freq: ");
+    // Serial.print(freq);
+    // Serial.print(" | Log Freq: ");
+    // Serial.print(log10(freq));
+    // Serial.print(" | Note: ");
+    // Serial.print(noteToDisplay);
+    // Serial.print(" | Octave: ");
+    // Serial.print(octaveToDisplay);
+    // Serial.print(" | Nearest Idx: ");
+    // Serial.print(nearestIdx);
+    // Serial.println("");
+
+    
+
+
+    delay(10);
 }
